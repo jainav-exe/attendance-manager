@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mongodb-backup
+spec:
+  schedule: "0 0 * * *"  # Run daily at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mongodb-backup
+            image: mongo:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              mongodump --uri="${MONGODB_URI}" --out=/backup/$(date +%Y%m%d) && \
+              tar -czf /backup/$(date +%Y%m%d).tar.gz /backup/$(date +%Y%m%d) && \
+              aws s3 cp /backup/$(date +%Y%m%d).tar.gz s3://${BACKUP_BUCKET}/mongodb/$(date +%Y%m%d).tar.gz && \
+              rm -rf /backup/$(date +%Y%m%d) /backup/$(date +%Y%m%d).tar.gz
+            env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: uri
+            - name: BACKUP_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: backup-config
+                  key: bucket
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: secret-key
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: backup-config
+                  key: region
+            volumeMounts:
+            - name: backup-volume
+              mountPath: /backup
+          volumes:
+          - name: backup-volume
+            emptyDir: {}
+          restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-config
+data:
+  bucket: "attendance-manager-backups"
+  region: "us-east-1" 
