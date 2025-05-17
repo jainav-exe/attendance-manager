@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/attendance-manager/static/css/main.ef1f230b.css",
+    "main.js": "/attendance-manager/static/js/main.7cd5a7c1.js",
+    "static/js/453.d13ab1b2.chunk.js": "/attendance-manager/static/js/453.d13ab1b2.chunk.js",
+    "service-worker.js": "/attendance-manager/service-worker.js",
+    "index.html": "/attendance-manager/index.html",
+    "main.ef1f230b.css.map": "/attendance-manager/static/css/main.ef1f230b.css.map",
+    "main.7cd5a7c1.js.map": "/attendance-manager/static/js/main.7cd5a7c1.js.map",
+    "453.d13ab1b2.chunk.js.map": "/attendance-manager/static/js/453.d13ab1b2.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ef1f230b.css",
+    "static/js/main.7cd5a7c1.js"
+  ]
+}
